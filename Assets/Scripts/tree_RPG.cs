@@ -58,7 +58,7 @@ break;
 private void patroling(){ 
     //Point to point move
     if (arbolPoint == 1){
-       transform.position = Vector3.MoveTowards(transform.position,point1.transform.position,enemySpeed * Time.deltaTime); //Accede al transform del objeto que lleve el script
+       transform.position = Vector3.MoveTowards(transform.position,point1.transform.position,enemySpeed * Time.deltaTime); //Accede al transform del objeto que lleve el script 
        
          if(Vector3.Distance(transform.position,point1.transform.position) < 0.05f){ //Si El enemigo esta sobre el punto "x", cambia de direccion al punto "y"
         arbolPoint = 2;
