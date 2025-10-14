@@ -13,8 +13,8 @@ public class NewMonoBehaviourScript : MonoBehaviour
 
     public float archerVel;
 
-
-
+    public enum Estados{caminar,idle,atacar}; //UNA LINEA EN LUGAR DE DOS
+    public Estados myEstadoP;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,29 +22,35 @@ public class NewMonoBehaviourScript : MonoBehaviour
         vida = 10;
         cooldown_weapon = 1.5F;
         
+        myEstadoP = Estados.idle;
+
         miAnimacion = GetComponent <Animator>();
 
-    
-        
        
     }
 
     // Update is called once per frame
     void Update()
     {
-    movimientoArcher();
-
-    ataqueArcher();
+    switch (myEstadoP){
+case Estados.caminar:
+caminanding();
+break;
+case Estados.idle:
+idling();
+break;
+case Estados.atacar:
+atacanding();
+break;
+    }
 
 
        
     }//End Update()
     
-   void movimientoArcher(){
+   //void movimientoArcher(){
+   void caminanding(){
 
-           if (!Input.anyKey&&spacepressed==false){
-        miAnimacion.Play("archer_idle_front");
-       }
         if (Input.GetKey(KeyCode.W)){
            transform.Translate(Vector3.up * archerVel * Time.deltaTime);
            if(!Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.D)){
@@ -67,23 +73,44 @@ public class NewMonoBehaviourScript : MonoBehaviour
         }//End move down
 
         if (Input.GetKey(KeyCode.D)){
-            transform.eulerAngles = new Vector3(0,0,0); //Flipear el personaje junto a la referencia en la coordenada
+            transform.eulerAngles = new Vector3(0,0,0); //Flipear el personaje junto a la referencia en la coordenada; Gira el gizmo del personaje
             transform.Translate(Vector3.right * archerVel * Time.deltaTime);
  
            miAnimacion.Play("archer_run_right");
 
         }//End move Right
-   }//EndMoveArcher
+
+        if(!Input.anyKey){
+         myEstadoP = Estados.idle;
+        }
+        if(Input.GetKeyDown(KeyCode.Space)){
+         myEstadoP = Estados.atacar;
+        }
+   }//END void caminanding()
 
 
-void ataqueArcher(){
+void idling(){
 
-if(Input.GetKeyDown(KeyCode.Space)){
+miAnimacion.Play("archer_idle_front");
+
+       if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)){
+         myEstadoP = Estados.caminar;
+       }
+        if(Input.GetKeyDown(KeyCode.Space)){
+         myEstadoP = Estados.atacar;
+        }
+}//End atacanding()
+
+
+void atacanding(){
+
 miAnimacion.Play("archer_attack_side");
+
+
+}//End atacanding
+
+public void setState(Estados newState){
+   myEstadoP = newState;
 }
-}//End ataqueArcher
 
-
-
-
-}
+}//END CLASS

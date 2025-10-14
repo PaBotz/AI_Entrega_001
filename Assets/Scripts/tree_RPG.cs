@@ -7,12 +7,14 @@ public Estados mystate;
 
 public GameObject Player;
 public GameObject point1,point2;
+public Transform point3;
 public GameObject bala;
 public Animator miAnimacionTree;
-public bool arbolPolicia, imshooting;
+public bool imshooting;
+
 
 public float enemySpeed;
-public int enemyVision;
+public int enemyVision, arbolPoint;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -21,9 +23,10 @@ public int enemyVision;
        miAnimacionTree = GetComponent<Animator>();
 
         mystate = Estados.patrol;
-        arbolPolicia = false;
+        arbolPoint = 1;
         enemySpeed = 4;
         enemyVision = 3;
+        
 
     }
 
@@ -52,25 +55,30 @@ break;
 
     }//End Update
 
-private void patroling(){
-   
-Debug.Log("Estoy patroling");
-//Point to point move
-    if (arbolPolicia){
-       transform.position = Vector3.MoveTowards(transform.position,point1.transform.position,enemySpeed * Time.deltaTime);
+private void patroling(){ 
+    //Point to point move
+    if (arbolPoint == 1){
+       transform.position = Vector3.MoveTowards(transform.position,point1.transform.position,enemySpeed * Time.deltaTime); //Accede al transform del objeto que lleve el script
        
-         if(Vector3.Distance(transform.position,point1.transform.position) < 0.05f){
-        arbolPolicia = false;
+         if(Vector3.Distance(transform.position,point1.transform.position) < 0.05f){ //Si El enemigo esta sobre el punto "x", cambia de direccion al punto "y"
+        arbolPoint = 2;
        }
     } 
     
-    if (!arbolPolicia){
+    if (arbolPoint == 2){
        transform.position = Vector3.MoveTowards(transform.position,point2.transform.position,enemySpeed * Time.deltaTime);
 
-       if(Vector3.Distance(transform.position,point2.transform.position) < 0.05f){
-        arbolPolicia = true;
+       if(Vector3.Distance(transform.position,point2.transform.position) < 0.05f){ // 0.05f = 0.05 metros; Todas las mediadas de Unity están en metros
+        arbolPoint = 3;
        }
     } 
+
+    if(arbolPoint == 3){
+        transform.position = Vector3.MoveTowards(transform.position,point3.position,enemySpeed * Time.deltaTime);
+        if (Vector3.Distance(transform.position,point3.position) <0.05f){
+            arbolPoint = 1;
+        }
+    }
  //change State
 if(Vector3.Distance(transform.position,Player.transform.position) <enemyVision) {
     mystate=Estados.chase;
@@ -78,7 +86,6 @@ if(Vector3.Distance(transform.position,Player.transform.position) <enemyVision) 
 }//End patroling()
 
 private void chasing(){
-    Debug.Log("Estoy chasing");
     transform.position = Vector3.MoveTowards(transform.position,Player.transform.position, enemySpeed * Time.deltaTime);
 
     if(Vector3.Distance(transform.position,Player.transform.position) <= 1) {
@@ -91,13 +98,13 @@ private void chasing(){
 
 private void attacking(){
 
-if(imshooting)
+/*if(imshooting)
 {
 InvokeRepeating(nameof(funcionBala), 0.0f,3.0f);
-}
-       if(Vector3.Distance(transform.position,Player.transform.position) <=enemyVision && Vector3.Distance(transform.position,Player.transform.position)>1 ) {mystate=Estados.chase;}
+} */
+    if(Vector3.Distance(transform.position,Player.transform.position) <=enemyVision && Vector3.Distance(transform.position,Player.transform.position)>1 ) {mystate=Estados.chase;}
 
-       if(Vector3.Distance(transform.position,Player.transform.position) >enemyVision) { mystate=Estados.patrol;}
+    if(Vector3.Distance(transform.position,Player.transform.position) >enemyVision) { mystate=Estados.patrol;}
     
 }//End attacking()
 
