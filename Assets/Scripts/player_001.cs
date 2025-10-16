@@ -1,13 +1,12 @@
 using UnityEngine;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class player_001 : MonoBehaviour
 {
     
     
-    int vida;
+   // int vida;
     int velocity;
     private Animator miAnimacion;
-    private float cooldown_weapon;
     private float cooldown_actual;
     private bool spacepressed;
 
@@ -19,8 +18,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        vida = 10;
-        cooldown_weapon = 1.5F;
+        //vida = 10;
         
         myEstadoP = Estados.idle;
 
@@ -48,9 +46,10 @@ break;
        
     }//End Update()
     
+
    //void movimientoArcher(){
    void caminanding(){
-
+Debug.Log("Camino");
         if (Input.GetKey(KeyCode.W)){
            transform.Translate(Vector3.up * archerVel * Time.deltaTime);
            if(!Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.D)){
@@ -104,11 +103,18 @@ miAnimacion.Play("archer_idle_front");
 
 void atacanding(){
 
+Debug.Log("Ataco");
 miAnimacion.Play("archer_attack_side");
 
 
 }//End atacanding
 
+
+/*
+Esta funcion está enlazada en a nuestra animación de ataque en la ventana de animation.
+Tenemos un evento que inicia cuando finaliza la animación.
+Este Evento tiene como opciones los estados que tengamos asociados al script, el estado escogido será el que se reproducirá tras acabar el evento, volviendo así al bucle de estados.
+*/
 public void setState(Estados newState){
    myEstadoP = newState;
 }
