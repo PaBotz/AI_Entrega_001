@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class enemy_001 : MonoBehaviour
@@ -5,7 +6,7 @@ public class enemy_001 : MonoBehaviour
 public enum Estados {patrol,chase,attack,explode};
 public Estados mystate;
 
-public GameObject Player;
+public GameObject Player, explosion_Effect;
 public GameObject point1,point2;
 public Transform point3; //Prueba: Uso de transform para ahorrar un paso con GameObject
 public GameObject bala;
@@ -14,8 +15,9 @@ public Animator miAnimacionTree;
 
 public float enemySpeed;
 private int arbol_LastPoint;
-public int distance_Low,distance_Med,distance_High; //Iniciadas en Unity
 
+public int distance_Low,distance_Med,distance_High;    //Iniciadas en Unity  
+private Vector3 ultimaPosicion, mov_direccion;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -25,7 +27,7 @@ public int distance_Low,distance_Med,distance_High; //Iniciadas en Unity
 
         mystate = Estados.patrol;
         arbol_LastPoint = 1;
-        enemySpeed = 4;
+        ultimaPosicion = transform.position; 
      
 
     }
@@ -34,7 +36,11 @@ public int distance_Low,distance_Med,distance_High; //Iniciadas en Unity
     void Update()
     {
 
-    switch (mystate)
+     calcular_Direccion_mov();
+     
+        ultimaPosicion = transform.position;
+
+        switch (mystate)
 {
     case Estados.patrol:
     patroling();
@@ -57,9 +63,14 @@ break;
 
 }//End switch
 
+
+
     }//End Update
 
-private void patroling(){ 
+private void patroling(){
+        updateAnimation();
+        miAnimacionTree.speed = 0.6f;
+        enemySpeed = 1;
     //Point to point move
     if (arbol_LastPoint == 1){
        transform.position = Vector3.MoveTowards(transform.position,point1.transform.position,enemySpeed * Time.deltaTime); //Accede al transform del objeto que lleve el script 
@@ -84,15 +95,18 @@ private void patroling(){
         }
     }
  //change State
-if(Vector3.Distance(transform.position,Player.transform.position) < distance_High) {
+if(Vector3.Distance(transform.position,Player.transform.position) < distance_Med) {
     mystate=Estados.chase;
 }
 }//End patroling()
 
 private void chasing(){
-    transform.position = Vector3.MoveTowards(transform.position,Player.transform.position, enemySpeed * Time.deltaTime);
+        updateAnimation();
+        miAnimacionTree.speed = 1.5f;
+        transform.position = Vector3.MoveTowards(transform.position,Player.transform.position, enemySpeed * Time.deltaTime);
+    enemySpeed = 6;
 
-    if(Vector3.Distance(transform.position,Player.transform.position) <= distance_Med) {
+        if (Vector3.Distance(transform.position,Player.transform.position) <= distance_Low) {
     mystate=Estados.attack;
     
     }   
@@ -101,46 +115,94 @@ private void chasing(){
 }//End chasing()
 
 private void attacking(){
+        miAnimacionTree.speed = 1f;
+        /*if(imshooting)
+        {
+        InvokeRepeating(nameof(funcionBala), 0.0f,3.0f);
+        } */
 
-/*if(imshooting)
-{
-InvokeRepeating(nameof(funcionBala), 0.0f,3.0f);
-} */
+        miAnimacionTree.Play("tree_Explode");
 
-    if(Vector3.Distance(transform.position,Player.transform.position) <= distance_High && Vector3.Distance(transform.position,Player.transform.position)> distance_Med) 
-    {
-        mystate = Estados.chase;
-    }
 
-    if(Vector3.Distance(transform.position,Player.transform.position) > distance_High) 
-    { 
-        mystate = Estados.patrol;
-    }
-
-    if (Vector3.Distance(transform.position,Player.transform.position) < distance_Med){
-        mystate = Estados.explode;
-    }
-    
+      
 }//End attacking()
 
 
 void exploding(){
-// si pasa una distancia minima el enemy:
-//Crecera
-for(int i=0;i< 30;i++){
-transform.scale ++;
-}
+     
+        Destroy(gameObject);
+
+       if (explosion_Effect != null)
+        {
+           GameObject explosion_Ins = Instantiate(explosion_Effect, transform.position, Quaternion.identity);
+            Destroy(explosion_Ins,0.05f);
+        }
+        else Debug.LogWarning("No se asignó el prefab de círculo de explosión en el inspector.");
+    }
+
+ 
+    
 
 
-//Desparezcera
+    private void calcular_Direccion_mov()
+    {
+        if (transform.position != ultimaPosicion)   //Esto lo entiendo como una fragmentacion del transform.position.
+        {                                           //Ya que al igualar ultimaposicion a transform.position podremos notar cambios en la polarizacion del eje.(+ o -)
+            mov_direccion = (transform.position - ultimaPosicion).normalized;
+        }
+        else{ mov_direccion = Vector3.zero; }
+        
+    }
 
-//Se dibujará un círculo que crezca rápidamente para simular una explosión en un rango
+
+    void updateAnimation()
+    {
+         if (mov_direccion == Vector3.zero) { miAnimacionTree.Play("tree_Idle"); }
+       
+
+            bool mov_derecha = mov_direccion.x > 0;
+            bool mov_izquierda = mov_direccion.x < 0;
+            bool mov_arriba = mov_direccion.y > 0;
+            bool mov_abajo = mov_direccion.y < 0;
 
 
-}
 
 
-private void funcionBala(){
+        bool movimientoHorizontal = Mathf.Abs(mov_direccion.x) > Mathf.Abs(mov_direccion.y);
+
+        if (movimientoHorizontal)
+        {
+            // Movimiento horizontal (derecha/izquierda)
+            if (mov_direccion.x > 0)
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                miAnimacionTree.Play("tree_running_side");
+            }
+            else
+            {
+                
+                transform.eulerAngles = new Vector3(0, 180, 0);
+                miAnimacionTree.Play("tree_running_side");
+            }
+        }
+        else
+        {
+            // Movimiento vertical (arriba/abajo)
+            if (mov_direccion.y > 0)
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                miAnimacionTree.Play("tree_running_back");
+            }
+            else
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                miAnimacionTree.Play("tree_running_front");
+            }
+        }
+    }
+
+
+    private void funcionBala(){
 
 Instantiate(bala,transform.position,transform.rotation);
 

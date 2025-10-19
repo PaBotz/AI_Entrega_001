@@ -49,7 +49,7 @@ break;
 
    //void movimientoArcher(){
    void caminanding(){
-Debug.Log("Camino");
+
         if (Input.GetKey(KeyCode.W)){
            transform.Translate(Vector3.up * archerVel * Time.deltaTime);
            if(!Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.D)){
@@ -103,7 +103,7 @@ miAnimacion.Play("archer_idle_front");
 
 void atacanding(){
 
-Debug.Log("Ataco");
+
 miAnimacion.Play("archer_attack_side");
 
 
