@@ -39,7 +39,7 @@ private Vector3 ultimaPosicion, mov_direccion;
      calcular_Direccion_mov();
      
         ultimaPosicion = transform.position;
-
+        #region Switch Estados
         switch (mystate)
 {
     case Estados.patrol:
@@ -60,14 +60,15 @@ private Vector3 ultimaPosicion, mov_direccion;
     default:
     print("Ningun estado seleccionado");
 break;
-
-}//End switch
+              #endregion
+        }//End switch
 
 
 
     }//End Update
 
-private void patroling(){
+    #region funciones de Estados
+    private void patroling(){
         updateAnimation();
         miAnimacionTree.speed = 0.6f;
         enemySpeed = 1;
@@ -140,10 +141,10 @@ void exploding(){
         else Debug.LogWarning("No se asignó el prefab de círculo de explosión en el inspector.");
     }
 
- 
-    
+    #endregion
 
 
+    #region Arreglo Animaciones de movimiento
     private void calcular_Direccion_mov()
     {
         if (transform.position != ultimaPosicion)   //Esto lo entiendo como una fragmentacion del transform.position.
@@ -200,7 +201,7 @@ void exploding(){
             }
         }
     }
-
+    #endregion
 
     private void funcionBala(){
 
