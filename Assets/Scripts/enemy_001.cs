@@ -38,6 +38,11 @@ private Vector3 ultimaPosicion, mov_direccion;
 
      calcular_Direccion_mov();
      
+if(Input.GetKey(KeyCode.B)){
+disparar();
+
+}
+
         ultimaPosicion = transform.position;
         #region Switch Estados
         switch (mystate)
@@ -203,7 +208,7 @@ void exploding(){
     }
     #endregion
 
-    private void funcionBala(){
+    private void disparar(){
 
 Instantiate(bala,transform.position,transform.rotation);
 

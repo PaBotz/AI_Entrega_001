@@ -51,21 +51,21 @@ break;
    void caminanding(){
 
         if (Input.GetKey(KeyCode.W)){
-           transform.Translate(Vector3.up * archerVel * Time.deltaTime);
+           transform.Translate(Vector3.up * archerVel * Time.deltaTime,Space.World);
            if(!Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.D)){
            miAnimacion.Play("archer_run_back");
            }
         }//End move Left
   
         if (Input.GetKey(KeyCode.A)){
-            transform.eulerAngles = new Vector3(0,180,0); //Flipear el personaje junto a la referencia en la coordenada
-           transform.Translate(Vector3.right * archerVel * Time.deltaTime);
+           transform.eulerAngles = new Vector3(0,180,0); //Flipear el personaje junto a la referencia en la coordenada
+           transform.Translate(Vector3.left * archerVel * Time.deltaTime,Space.World);
            miAnimacion.Play("archer_run_right");
            
         }//End move left
 
         if (Input.GetKey(KeyCode.S)){
-           transform.Translate(Vector3.down * archerVel * Time.deltaTime);
+           transform.Translate(Vector3.down * archerVel * Time.deltaTime,Space.World);
            if(!Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.D)){
            miAnimacion.Play("archer_run_front");
            }
@@ -73,7 +73,7 @@ break;
 
         if (Input.GetKey(KeyCode.D)){
             transform.eulerAngles = new Vector3(0,0,0); //Flipear el personaje junto a la referencia en la coordenada; Gira el gizmo del personaje
-            transform.Translate(Vector3.right * archerVel * Time.deltaTime);
+            transform.Translate(Vector3.right * archerVel * Time.deltaTime,Space.World);
  
            miAnimacion.Play("archer_run_right");
 
