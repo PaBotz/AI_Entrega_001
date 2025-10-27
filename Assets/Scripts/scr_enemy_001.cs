@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class enemy_001 : MonoBehaviour
+public class scr_enemy_001 : MonoBehaviour
 {
 public enum Estados {patrol,chase,attack,explode};
 public Estados mystate;
@@ -15,6 +15,7 @@ public Animator miAnimacionTree;
 
 public float enemySpeed;
 private int arbol_LastPoint;
+    private int tiempoUltimoDisparo, cadenciaDisparo;
 
 public int distance_Low,distance_Med,distance_High;    //Iniciadas en Unity  
 private Vector3 ultimaPosicion, mov_direccion;
@@ -23,12 +24,15 @@ private Vector3 ultimaPosicion, mov_direccion;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       miAnimacionTree = GetComponent<Animator>();
 
+        #region **NoModificables**
+        miAnimacionTree = GetComponent<Animator>();
         mystate = Estados.patrol;
         arbol_LastPoint = 1;
-        ultimaPosicion = transform.position; 
-     
+        ultimaPosicion = transform.position;
+        tiempoUltimoDisparo = 0;
+        cadenciaDisparo = 1;
+        #endregion
 
     }
 
@@ -38,11 +42,6 @@ private Vector3 ultimaPosicion, mov_direccion;
 
      calcular_Direccion_mov();
      
-if(Input.GetKey(KeyCode.B)){
-disparar();
-
-}
-
         ultimaPosicion = transform.position;
         #region Switch Estados
         switch (mystate)
@@ -110,7 +109,9 @@ private void chasing(){
         updateAnimation();
         miAnimacionTree.speed = 1.5f;
         transform.position = Vector3.MoveTowards(transform.position,Player.transform.position, enemySpeed * Time.deltaTime);
-    enemySpeed = 6;
+        enemySpeed = 6;
+
+        disparar();
 
         if (Vector3.Distance(transform.position,Player.transform.position) <= distance_Low) {
     mystate=Estados.attack;
@@ -121,13 +122,14 @@ private void chasing(){
 }//End chasing()
 
 private void attacking(){
-        miAnimacionTree.speed = 1f;
+
+        miAnimacionTree.speed = 1f; 
         /*if(imshooting)
         {
         InvokeRepeating(nameof(funcionBala), 0.0f,3.0f);
         } */
 
-        miAnimacionTree.Play("tree_Explode");
+        miAnimacionTree.Play("tree_Explode");   //Cuando termine empezará un evento en el animation que pasará a exploding cuando termine la animación
 
 
       
@@ -152,9 +154,9 @@ void exploding(){
     #region Arreglo Animaciones de movimiento
     private void calcular_Direccion_mov()
     {
-        if (transform.position != ultimaPosicion)   //Esto lo entiendo como una fragmentacion del transform.position.
-        {                                           //Ya que al igualar ultimaposicion a transform.position podremos notar cambios en la polarizacion del eje.(+ o -)
-            mov_direccion = (transform.position - ultimaPosicion).normalized;
+        if (transform.position != ultimaPosicion)   
+        {                                           
+            mov_direccion = (transform.position - ultimaPosicion).normalized; //Compara donde está el enemy con donde estaba antes. Solo sirve para preparar el siguiente metodo updateAnimation()
         }
         else{ mov_direccion = Vector3.zero; }
         
@@ -208,10 +210,21 @@ void exploding(){
     }
     #endregion
 
-    private void disparar(){
+    private void disparar()
+    {
 
-Instantiate(bala,transform.position,transform.rotation);
+        if (Time.time > tiempoUltimoDisparo + cadenciaDisparo)
+        {
+            GameObject balaInstanciada = Instantiate(bala, transform.position, Quaternion.identity);
 
-}
+            balaInstanciada.GetComponent<src_bala>().Player = Player;
+            #region Explicacion linea anterior
+            //Esto lo creo dentro del objeto instanciado; podría ponerlo directamente en el prefab, pero bueno, así está bien
+            //Llama a la variable publica que está en el script de la bala
+            #endregion
+            tiempoUltimoDisparo = (int) Time.time; //Solo acepta floats
+            Debug.Log("Time.time: " + Time.time + "/n tiempoUltimoDisparo " + tiempoUltimoDisparo);
+        }
+    }
 
 }//End Class

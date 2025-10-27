@@ -141,3 +141,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::src_bala
   Player: {fileID: 5653105405723934676, guid: 72c484eb42d83404ba755f04b39a22ba, type: 3}
+  velocidad: 15

@@ -1,14 +1,18 @@
+
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class player_001 : MonoBehaviour
+public class scr_player : MonoBehaviour
 {
     
     
    // int vida;
     int velocity;
     private Animator miAnimacion;
-    private float cooldown_actual;
-    private bool spacepressed;
+    public GameObject corazon_001, corazon_002, corazon_003;
+    private Rigidbody rb;
+    public int vida;
+ 
 
     public float archerVel;
 
@@ -23,12 +27,14 @@ public class player_001 : MonoBehaviour
         myEstadoP = Estados.idle;
 
         miAnimacion = GetComponent <Animator>();
+        rb = GetComponent<Rigidbody>();
+
 
        
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
     switch (myEstadoP){
 case Estados.caminar:
@@ -48,7 +54,7 @@ break;
     
 
    //void movimientoArcher(){
-   void caminanding(){
+   private void caminanding(){
 
         if (Input.GetKey(KeyCode.W)){
            transform.Translate(Vector3.up * archerVel * Time.deltaTime,Space.World);
@@ -88,7 +94,7 @@ break;
    }//END void caminanding()
 
 
-void idling(){
+private void idling(){
 
 miAnimacion.Play("archer_idle_front");
 
@@ -101,7 +107,7 @@ miAnimacion.Play("archer_idle_front");
 }//End atacanding()
 
 
-void atacanding(){
+private void atacanding(){
 
 
 miAnimacion.Play("archer_attack_side");
@@ -110,13 +116,29 @@ miAnimacion.Play("archer_attack_side");
 }//End atacanding
 
 
-/*
-Esta funcion está enlazada en a nuestra animación de ataque en la ventana de animation.
-Tenemos un evento que inicia cuando finaliza la animación.
-Este Evento tiene como opciones los estados que tengamos asociados al script, el estado escogido será el que se reproducirá tras acabar el evento, volviendo así al bucle de estados.
-*/
-public void setState(Estados newState){
-   myEstadoP = newState;
+   void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("colisiono algo");
+       if(collision.gameObject.CompareTag("explosion"))
+        {
+            vida = 2;
+            corazon_003.SetActive(false);
+            Debug.Log("vida: " + vida);
+        }
+        
+    }
+
+
+
+
+
+    /*
+    Esta funcion está enlazada en a nuestra animación de ataque en la ventana de animation.
+    Tenemos un evento que inicia cuando finaliza la animación.
+    Este Evento tiene como opciones los estados que tengamos asociados al script, el estado escogido será el que se reproducirá tras acabar el evento, volviendo así al bucle de estados.
+    */
+    public void setState(Estados newState){
+    myEstadoP = newState;
 }
 
 }//END CLASS
