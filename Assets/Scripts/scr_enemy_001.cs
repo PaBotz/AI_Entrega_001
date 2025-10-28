@@ -40,100 +40,104 @@ private Vector3 ultimaPosicion, mov_direccion;
     void Update()
     {
 
-     calcular_Direccion_mov();
-     
+        calcular_Direccion_mov();
+
         ultimaPosicion = transform.position;
-        #region Switch Estados
+
         switch (mystate)
-{
-    case Estados.patrol:
-    patroling();
-    break;
-     case Estados.chase:
-    chasing();
-    break;
+        {
+            case Estados.patrol:
+                patroling();
+                break;
+            case Estados.chase:
+                chasing();
+                break;
 
- case Estados.attack:
-    attacking();
-    break;
+            case Estados.attack:
+                attacking();
+                break;
 
-    case Estados.explode:
-    exploding();
-    break;
+            case Estados.explode:
+                exploding();
+                break;
 
-    default:
-    print("Ningun estado seleccionado");
-break;
-              #endregion
+            default:
+                print("Ningun estado seleccionado");
+                break;
+
         }//End switch
-
-
 
     }//End Update
 
+
     #region funciones de Estados
-    private void patroling(){
+    private void patroling()
+    {
         updateAnimation();
         miAnimacionTree.speed = 0.6f;
         enemySpeed = 1;
-    //Point to point move
-    if (arbol_LastPoint == 1){
-       transform.position = Vector3.MoveTowards(transform.position,point1.transform.position,enemySpeed * Time.deltaTime); //Accede al transform del objeto que lleve el script 
-       
-         if(Vector3.Distance(transform.position,point1.transform.position) < 0.05f){ //Si El enemigo esta sobre el punto "x", cambia de direccion al punto "y"
-        arbol_LastPoint = 2;
-       }
-    } 
-    
-    if (arbol_LastPoint == 2){
-       transform.position = Vector3.MoveTowards(transform.position,point2.transform.position,enemySpeed * Time.deltaTime);
+        //Point to point move
+        if (arbol_LastPoint == 1)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, point1.transform.position, enemySpeed * Time.deltaTime); //Accede al transform del objeto que lleve el script 
 
-       if(Vector3.Distance(transform.position,point2.transform.position) < 0.05f){ // 0.05f = 0.05 metros; Todas las mediadas de Unity están en metros
-        arbol_LastPoint = 3;
-       }
-    } 
-
-    if(arbol_LastPoint == 3){
-        transform.position = Vector3.MoveTowards(transform.position,point3.position,enemySpeed * Time.deltaTime);
-        if (Vector3.Distance(transform.position,point3.position) <0.05f){
-            arbol_LastPoint = 1;
+            if (Vector3.Distance(transform.position, point1.transform.position) < 0.05f)
+            { //Si El enemigo esta sobre el punto "x", cambia de direccion al punto "y"
+                arbol_LastPoint = 2;
+            }
         }
-    }
- //change State
-if(Vector3.Distance(transform.position,Player.transform.position) < distance_Med) {
-    mystate=Estados.chase;
-}
-}//End patroling()
 
-private void chasing(){
+        if (arbol_LastPoint == 2)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, point2.transform.position, enemySpeed * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, point2.transform.position) < 0.05f)
+            { // 0.05f = 0.05 metros; Todas las mediadas de Unity están en metros
+                arbol_LastPoint = 3;
+            }
+        }
+
+        if (arbol_LastPoint == 3)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, point3.position, enemySpeed * Time.deltaTime);
+            if (Vector3.Distance(transform.position, point3.position) < 0.05f)
+            {
+                arbol_LastPoint = 1;
+            }
+        }
+        //change State
+        if (Vector3.Distance(transform.position, Player.transform.position) < distance_Med)
+        {
+            mystate = Estados.chase;
+        }
+    }//End patroling()
+
+
+    private void chasing()
+    {
         updateAnimation();
         miAnimacionTree.speed = 1.5f;
-        transform.position = Vector3.MoveTowards(transform.position,Player.transform.position, enemySpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, Player.transform.position, enemySpeed * Time.deltaTime);
         enemySpeed = 6;
 
         disparar();
 
-        if (Vector3.Distance(transform.position,Player.transform.position) <= distance_Low) {
-    mystate=Estados.attack;
-    
-    }   
-    if(Vector3.Distance(transform.position,Player.transform.position) > distance_High) {mystate=Estados.patrol;}
-
-}//End chasing()
-
-private void attacking(){
-
-        miAnimacionTree.speed = 1f; 
-        /*if(imshooting)
+        if (Vector3.Distance(transform.position, Player.transform.position) <= distance_Low)
         {
-        InvokeRepeating(nameof(funcionBala), 0.0f,3.0f);
-        } */
+            mystate = Estados.attack;
 
+        }
+        if (Vector3.Distance(transform.position, Player.transform.position) > distance_High) { mystate = Estados.patrol; }
+
+    }//End chasing()
+
+    private void attacking()
+    {
+
+        miAnimacionTree.speed = 1f;
         miAnimacionTree.Play("tree_Explode");   //Cuando termine empezará un evento en el animation que pasará a exploding cuando termine la animación
 
-
-      
-}//End attacking()
+    }//End attacking()
 
 
 void exploding(){
@@ -165,18 +169,14 @@ void exploding(){
 
     void updateAnimation()
     {
-         if (mov_direccion == Vector3.zero) { miAnimacionTree.Play("tree_Idle"); }
-       
+        if (mov_direccion == Vector3.zero) { miAnimacionTree.Play("tree_Idle"); }
 
-            bool mov_derecha = mov_direccion.x > 0;
-            bool mov_izquierda = mov_direccion.x < 0;
-            bool mov_arriba = mov_direccion.y > 0;
-            bool mov_abajo = mov_direccion.y < 0;
+        bool mov_derecha = mov_direccion.x > 0;
+        bool mov_izquierda = mov_direccion.x < 0;
+        bool mov_arriba = mov_direccion.y > 0;
+        bool mov_abajo = mov_direccion.y < 0;
 
-
-
-
-        bool movimientoHorizontal = Mathf.Abs(mov_direccion.x) > Mathf.Abs(mov_direccion.y);
+        bool movimientoHorizontal = Mathf.Abs(mov_direccion.x) >= Mathf.Abs(mov_direccion.y);
 
         if (movimientoHorizontal)
         {
@@ -188,7 +188,7 @@ void exploding(){
             }
             else
             {
-                
+
                 transform.eulerAngles = new Vector3(0, 180, 0);
                 miAnimacionTree.Play("tree_running_side");
             }
@@ -222,7 +222,7 @@ void exploding(){
             //Esto lo creo dentro del objeto instanciado; podría ponerlo directamente en el prefab, pero bueno, así está bien
             //Llama a la variable publica que está en el script de la bala
             #endregion
-            tiempoUltimoDisparo = (int) Time.time; //Solo acepta floats
+            tiempoUltimoDisparo = (int)Time.time; //Solo acepta floats
             Debug.Log("Time.time: " + Time.time + "/n tiempoUltimoDisparo " + tiempoUltimoDisparo);
         }
     }
